@@ -42,27 +42,36 @@ client.on("interactionCreate", async (interaction) => {
         return interaction.reply("Pong!!");
     }
 
-   if(interaction.commandName === "create"){
+  if (interaction.commandName === "create") {
+
     const url = interaction.options.getString("url");
+
     await interaction.deferReply();
 
-    try{
+    try {
+
         const response = await axios.post(
             "http://localhost:8001/url/discord",
             {
                 url: url
             }
         );
+
+        console.log(response.data);
+
         return interaction.editReply(
-            `Short URL created!\n${response.datashortURL}`
+            `Short URL created!\n${response.data.shortURL}`
         );
-    }catch(error){
+
+    } catch (error) {
+
         console.error(error);
+
         return interaction.editReply(
             "Failed to create short URL"
-        )
+        );
     }
-   }
+}
 });
 
 client.login(process.env.DISCORD_TOKEN);
