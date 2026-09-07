@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const { Client, GatewayIntentBits } = require("discord.js");
+const axios = require("axios");
 
 const client = new Client({
     intents: [
@@ -41,14 +42,27 @@ client.on("interactionCreate", async (interaction) => {
         return interaction.reply("Pong!!");
     }
 
-    if (interaction.commandName === "create") {
+   if(interaction.commandName === "create"){
+    const url = interaction.options.getString("url");
+    await interaction.deferReply();
 
-        const url = interaction.options.getString("url");
-
-        return interaction.reply(
-            `Generating short URL for: ${url}`
+    try{
+        const response = await axios.post(
+            "http://localhost:8001/url/discord",
+            {
+                url: url
+            }
         );
+        return interaction.editReply(
+            `Short URL created!\n${response.datashortURL}`
+        );
+    }catch(error){
+        console.error(error);
+        return interaction.editReply(
+            "Failed to create short URL"
+        )
     }
+   }
 });
 
 client.login(process.env.DISCORD_TOKEN);
